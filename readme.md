@@ -5,12 +5,13 @@ It is assume you have already created a HostedZone in Route53 (ie your domain na
 https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-validate-dns.html
 
 
+```
 aws cloudformation create-stack \
   --region eu-west-1 \
   --stack-name rhysc-clickstream-cf-eu-west-1 \
   --template-body file:///Users/rhysc/src/clickstream/clickstream-cf.yml \
   --parameters ParameterKey=HostedZone,ParameterValue=rhysc.io,ParameterKey=AcmSslId,ParameterValue=d0bf32cc-6948-4687-bdfa-aecaacf88cc3,ParameterKey=DnsPrefix,ParameterValue=clickstream
-  
+```
 
 Need to:
 - swap out the click tracking url in the index.html to used the TrackingDomain output param
