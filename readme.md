@@ -17,6 +17,7 @@ Need to:
 - upload the 'i' pixel (and optionally the modified index.html) to the s3 bucket using the SiteBucketName  output param
 
 `aws s3 cp i s3://{websitecontentbucket}/i --acl public-read` 
+
 `aws s3 cp index.html s3://{websitecontentbucket}/index.html --acl public-read`  
 
 `i` pixel image originally sourced from:
