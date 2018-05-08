@@ -1,0 +1,118 @@
+<html>
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+    
+    <!-- Snowplow starts plowing -->
+    <script type="text/javascript">
+      ;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];
+      p.GlobalSnowplowNamespace.push(i);p[i]=function(){(p[i].q=p[i].q||[]).push(arguments)
+      };p[i].q=p[i].q||[];n=l.createElement(o);g=l.getElementsByTagName(o)[0];n.async=1;
+      n.src=w;g.parentNode.insertBefore(n,g)}}(window,document,"script","//d1fc8wv8zag5ca.cloudfront.net/2.8.2/sp.js","snowplow"));
+      
+      window.snowplow('newTracker', 'cf', 'rhys-cf-s3-test8.rhysc.io', { // Initialise a tracker
+        appId: 'my-awesome-app',
+        //cookieDomain: '{{MY-COOKIE-DOMAIN}}'
+      });
+      
+      //https://github.com/snowplow/snowplow/wiki/2-Specific-event-tracking-with-the-Javascript-tracker
+
+      // Turn on page pings every 10 seconds
+      //window.snowplow('enableActivityTracking', 10, 10);
+
+      window.snowplow(
+        'trackPageView',
+      
+        // no custom title
+        null,
+      
+        // The usual array of static contexts
+        [{
+          schema: 'iglu:com.acme/my_static_context/jsonschema/1-0-0',
+          data: {
+            tournament: "Mega Poker tournament",
+            userid: "rhystestuser123",
+
+          }
+        }],
+      
+        // Function which returns an array of custom contexts
+        // Gets called once per page view / page ping
+        function() {
+          return [{
+            schema: 'iglu:com.acme/dynamic_context/jsonschema/1-0-0',
+            data: {
+              dynamicValue: new Date().toString()
+            }
+          }];
+        }
+      );
+
+
+      
+    </script>
+    <!-- Snowplow stops plowing -->
+
+
+  </head>
+  <body>
+    
+  
+
+    <div>
+        <button id="btnTrackClick">Track this std event</button>
+        <button id="btnTrackCustomEventClick">Track this custom event</button>
+    </div>
+
+
+
+    <script type="text/javascript">    
+      //snowplow_name_here('trackStructEvent', 'category', 'action', 'label', 'property', 'value');
+      let trackEvent = function(action, label, prop, value){
+        window.snowplow('trackStructEvent', 'RhysCTest', action, label, prop, value);
+      }
+
+      let createClickMetaData = function(on, off){ 
+        return {
+          onDownTarget : on.target.id,
+          onDownTimestamp : on.timeStamp,
+          onUpTarget : off.target.id,
+          onUpTimestamp : off.timeStamp,
+          deltaClientX : on.clientX - off.clientX , 
+          deltaClientY: on.clientY - off.clientY,
+          deltaMilliSeconds: off.timeStamp - on.timeStamp
+        }
+      };   
+
+      var sendRichsampleData = function(clickMetadata){
+        window.snowplow('trackSelfDescribingEvent', {
+          schema: 'iglu:com.acme_company/viewed_product/jsonschema/2-0-0',
+          data: {
+              productId: 'ASO01043',
+              category: 'Dresses',
+              brand: 'ACME',
+              returning: true,
+              price: 49.95,
+              sizes: ['xs', 's', 'l', 'xl', 'xxl'],
+              availableSince: new Date(2013,3,7),
+              clickMetadata: clickMetadata
+          }
+        });
+      }
+
+      document.getElementById("btnTrackClick").onclick = function(){ trackEvent()};
+      //document.getElementById("btnTrackCustomEventClick").onclick = function(){ trackCustomEvent()};
+
+      $("#btnTrackCustomEventClick").mousedown(function(event1){
+        $(this).mouseup(function(event2){
+            let clickMetadata= createClickMetaData(event1, event2); 
+            sendRichsampleData(clickMetadata);
+            $(this).off("mouseup");           
+        })
+      })  
+     
+    </script>  
+</body>
+</html>
